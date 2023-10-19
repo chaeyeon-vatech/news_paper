@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { ArticleType } from "./types";
-import {
-  ArticleContainer,
-  ArticleContainerWrapper,
-  Container,
-  FilterButton,
-  FilterButtonsContainer,
-  Menu,
-} from "./styles";
+import { ArticleContainer, ArticleContainerWrapper, Container, FilterButton, Menu, Top } from "./styles";
+import SearchIcon from "../../ui/Icon/icons/SearchIcon";
+import DateIcon from "../../ui/Icon/icons/DateIcon";
 
 
 function HomeScreen() {
@@ -29,12 +24,12 @@ function HomeScreen() {
   return (
 
     <Container>
-        <FilterButtonsContainer>
-          <FilterButton>Filter 1</FilterButton>
-          <FilterButton>Filter 2</FilterButton>
-          <FilterButton>Filter 3</FilterButton>
-        </FilterButtonsContainer>
 
+      <Top>
+        <FilterButton width={"9rem"}><SearchIcon width={20} />전체 헤드라인</FilterButton>
+        <FilterButton width={"8rem"}><DateIcon width={20} />전체 날짜</FilterButton>
+        <FilterButton width={"6rem"}>전체 국가</FilterButton>
+      </Top>
 
       <ArticleContainerWrapper>
         {articles.map((article, index) => (
@@ -49,7 +44,6 @@ function HomeScreen() {
         <div>Menu Item 1</div>
         <div>Menu Item 2</div>
         <div>Menu Item 3</div>
-        {/* Add more menu items as needed */}
       </Menu>
     </Container>
   );
