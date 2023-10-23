@@ -1,50 +1,82 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { ArticleType } from "./types";
-import { ArticleContainer, ArticleContainerWrapper, Container, FilterButton, Menu, Top } from "./styles";
-import SearchIcon from "../../ui/Icon/icons/SearchIcon";
-import DateIcon from "../../ui/Icon/icons/DateIcon";
-
+import {
+  ArticleAuthorTypography,
+  ArticleBox,
+  ArticleContainer, ArticleTitleContainer,
+  ArticleTitleTypography,
+  Container,
+  FilterButton,
+  FilterContainer,
+  Menu,
+  MenuContainer,
+} from "ui/styles/home.styles";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "store";
+import { setArticles } from "store/articleSlice";
+import { DateIcon, SearchIcon } from "ui/Icons";
+import StarIcon from "../../ui/Icons/StarIcon";
 
 function HomeScreen() {
-  const [articles, setArticles] = useState<ArticleType[]>([]);
+  const articles = useSelector((state: RootState) => state.articles.articles);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    // NEW YORK TIMES API 호출
-    axios.get("https://api.nytimes.com/svc/topstories/v2/home.json?api-key=WIYmzfoP2jaYdkpnp1mwFtR7lG9TuQbn")
-      .then((response) => {
-        // API로부터 받은 데이터를 상태에 설정
-        setArticles(response.data.results);
-      })
-      .catch((error) => {
-        console.error("API 요청 중 오류 발생:", error);
-      });
-  }, []);
+    axios.get("/api/getArticles").then(response => {
+      console.log(response);
+      dispatch(setArticles(response.data));
+    });
+  }, [dispatch]);
+
+  const [isScrapped, setIsScrapped] = useState<{ [key: number]: boolean }>({});
+
+  const toggleScrap = (index: number) => {
+    setIsScrapped(prevState => ({
+      ...prevState,
+      [index]: !prevState[index],
+    }));
+  };
 
   return (
-
     <Container>
+      <FilterContainer>
+        <FilterButton width={"8rem"}>
+          <SearchIcon width={"1rem"} />
+          전체 헤드라인
+        </FilterButton>
+        <FilterButton width={"7rem"}>
+          <DateIcon width={"1rem"} />
+          전체 날짜
+        </FilterButton>
+        <FilterButton width={"5rem"}>전체 국가</FilterButton>
+      </FilterContainer>
 
-      <Top>
-        <FilterButton width={"9rem"}><SearchIcon width={20} />전체 헤드라인</FilterButton>
-        <FilterButton width={"8rem"}><DateIcon width={20} />전체 날짜</FilterButton>
-        <FilterButton width={"6rem"}>전체 국가</FilterButton>
-      </Top>
-
-      <ArticleContainerWrapper>
+      <ArticleContainer>
         {articles.map((article, index) => (
-          <ArticleContainer key={index}>
-            <h2>{article.title}</h2>
-            <p>{article.abstract}</p>
-          </ArticleContainer>
-        ))}
-      </ArticleContainerWrapper>
+          <ArticleBox key={index}>
+            <div>
+              <ArticleTitleContainer>
+                <ArticleTitleTypography>{article.title}</ArticleTitleTypography>
+                <StarIcon width={"1.5rem"} height={"1.5rem"} color={"#6D6D6D"} />
+              </ArticleTitleContainer>
+              <ArticleAuthorTypography>{article.byline}</ArticleAuthorTypography>
+            </div>
+            <div>
+              <DateIcon
+                onClick={() => toggleScrap(index)}
+                color={isScrapped[index] ? "#00000" : "#FFFF99"}
+              />
+            </div>
+          </ArticleBox>
 
-      <Menu>
-        <div>Menu Item 1</div>
-        <div>Menu Item 2</div>
-        <div>Menu Item 3</div>
-      </Menu>
+        ))}
+      </ArticleContainer>
+
+      <MenuContainer>
+        <Menu>Menu Item 1</Menu>
+        <Menu>Menu Item 2</Menu>
+        <Menu>Menu Item 3</Menu>
+      </MenuContainer>
     </Container>
   );
 }
