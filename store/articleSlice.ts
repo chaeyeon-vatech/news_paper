@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ArticleType } from "../types";
-import { RootState } from "store";
+import { StateType } from "store";
 
 interface ArticleState {
   articles: ArticleType[];
@@ -22,6 +22,6 @@ const articleSlice = createSlice({
 
 export const { setArticles } = articleSlice.actions;
 
-export const selectArticles = (state: RootState) => state.articles;
+export const selectArticles = (state: StateType) => state.articles;
 
 export default articleSlice.reducer;
