@@ -1,18 +1,33 @@
-import Dialog, {
-  DialogAction,
-  DialogContents,
-} from "../../../ui/components/Dialog";
-import Stack from "../../../ui/components/Stack";
-import StackItem from "../../../ui/components/StackItem";
-import { Button, Headline, Input } from "../../../ui/styles/filter.styles";
-import React from "react";
+import Dialog, { DialogAction, DialogContents } from "ui/components/Dialog";
+import Stack from "ui/components/Stack";
+import StackItem from "ui/components/StackItem";
+import {
+  Button,
+  CountryListFilterContainer,
+  Headline,
+  Input,
+} from "ui/styles/filter.styles";
+import React, { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { StateType } from "../../../store";
-import { closeDialog } from "../../../store/dialogSlice";
+import { StateType } from "store";
+import { closeDialog } from "store/dialogSlice";
+import { Controller, FieldErrors, Resolver, useForm } from "react-hook-form";
+import produce from "immer";
+import { yupResolver } from "@hookform/resolvers/yup";
+import useClinicValidation from "./useSearchValidation";
+import { FilterType, setFilter } from "store/filterSlice";
+
+function isValidDate(date: Date) {
+  return date !== null && !isNaN(date.getTime());
+}
 
 const SearchFilterDialog = () => {
   const isDialogOpen = useSelector((state: StateType) => state.dialog.isOpen);
   const dialogContent = useSelector((state: StateType) => state.dialog.content);
+  const dispatch = useDispatch();
+  const handleCloseDialog = () => {
+    dispatch(closeDialog());
+  };
   const countryList = [
     "대한민국",
     "중국",
@@ -23,11 +38,42 @@ const SearchFilterDialog = () => {
     "프랑스",
     "영국",
   ];
+  const { schema } = useClinicValidation();
+  const methods = useForm<FilterType>({
+    defaultValues: {
+      date: null,
+    },
+    resolver: yupResolver<Resolver<FilterType>>(schema),
+    mode: "onSubmit",
+  });
 
-  const dispatch = useDispatch();
-  // 다이얼로그 닫기
-  const handleCloseDialog = () => {
-    dispatch(closeDialog());
+  const { register, handleSubmit, control } = methods;
+  const [selectedCountry, setSelectedCountry] = React.useState<string[]>([]);
+
+  const onClickCountryList = useCallback(
+    (country: string) => {
+      setSelectedCountry(
+        produce(draft => {
+          const countryIndex = draft.indexOf(country);
+          if (countryIndex !== -1) {
+            draft.splice(countryIndex, 1);
+          } else {
+            draft.push(country);
+          }
+        }),
+      );
+    },
+    [setSelectedCountry],
+  );
+
+  const onSubmit = (data: FilterType) => {
+    console.log(data);
+    dispatch(setFilter(data));
+    handleCloseDialog();
+  };
+
+  const onFail = (error: FieldErrors<FilterType>) => {
+    console.log(error);
   };
 
   return (
@@ -38,42 +84,69 @@ const SearchFilterDialog = () => {
             <Headline>헤드라인</Headline>
           </StackItem>
           <StackItem>
-            <Input placeholder="검색하실 헤드라인을 입력해주세요." />
+            <Input
+              {...register("headline")}
+              placeholder="검색하실 헤드라인을 입력해주세요."
+            />
           </StackItem>
           <StackItem>
             <Headline>날짜</Headline>
           </StackItem>
           <StackItem>
-            <Input placeholder="검색하실 헤드라인을 입력해주세요." />
+            <Controller
+              name="date"
+              control={control}
+              render={({ field }) => {
+                const { value = null, onChange } = field;
+                return (
+                  <Input
+                    type="date"
+                    value={value ? new Date(value).toLocaleDateString() : ""}
+                    onChange={(e) => {
+                      const selectedDate = new Date(e.target.value);
+                      if (!isNaN(selectedDate.getTime())) {
+                        onChange(selectedDate);
+                      } else {
+                        onChange(null);
+                      }
+                    }}
+                  />
+                );
+              }}
+            />
+
           </StackItem>
           <StackItem>
             <Headline>국가</Headline>
           </StackItem>
           <StackItem>
-            {countryList.map((ma: string, index: number) => {
-              return (
-                <div
-                  style={{
-                    display: "inline-flex",
-                    padding: "0.25rem 0.5rem",
-                    alignItems: "flex-start",
-                    margin: "0.25rem",
-                    borderRadius: "2rem",
-                    border:"1px solid #6D6D6D",
-                    // border: `1px solid ${selected?"#6D6D6D":"#82B0F4"}`,
-                    color: "#6D6D6D",
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  {ma}
-                </div>
-              );
-            })}
+            <Stack direction={"row"} wrap={"wrap"}>
+              <Controller
+                control={control}
+                name="countryList"
+                render={({ field }) => (
+                  <Stack direction="row" wrap="wrap">
+                    {countryList.map((country, index) => (
+                      <StackItem
+                        key={index}
+                        onClick={() => onClickCountryList(country)}
+                      >
+                        <CountryListFilterContainer
+                          selected={selectedCountry.includes(country)}
+                        >
+                          {country}
+                        </CountryListFilterContainer>
+                      </StackItem>
+                    ))}
+                  </Stack>
+                )}
+              />
+            </Stack>
           </StackItem>
         </Stack>
       </DialogContents>
       <DialogAction>
-        <Button>필터 적용하기</Button>
+        <Button onClick={handleSubmit(onSubmit, onFail)}>필터 적용하기</Button>
       </DialogAction>
     </Dialog>
   );

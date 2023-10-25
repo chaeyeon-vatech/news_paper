@@ -17,10 +17,8 @@ const ArticleBox = styled("div")(() => ({
   justifyContent: "space-between",
   borderRadius: "0.5rem",
   background: "var(--White-90, #FEFEFE)",
-  width: "100%", // 요소가 가득 차도록 설정
-  height: "auto", // 내용에 따라 높이 자동 조정
-
-  // 반응형 스타일 적용
+  width: "100%",
+  height: "auto",
   [`@media (min-width: ${mobileBreakpoint})`]: {
     width: "calc(50% - 20px)",
   },

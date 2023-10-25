@@ -5,7 +5,6 @@ const DialogAction = styled("div")<{ noMargin?: boolean }>(
     margin: noMargin ? undefined : 16,
     display: "flex",
     alignItems: "center",
-    justifyContent: "end",
   }),
 );
 
