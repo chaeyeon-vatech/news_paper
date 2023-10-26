@@ -9,7 +9,7 @@ const store = configureStore({
     articles: articleReducer,
     filter: filterReducer,
     dialog: dialogReducer,
-    page: pageReducer, // Add the page reducer
+    page: pageReducer,
   },
 });
 

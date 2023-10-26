@@ -33,12 +33,12 @@ const ArticleList = () => {
   );
 
   const dispatch = useDispatch();
-  const apiKey = "3h3LIoRYsXWZbm5HpyRAcPjmGEu387lX";
+  const apiKey = "Ne9tWZU7ujb4uERYMY7zVz9Vv7Wujvgd";
 
   if (filter.date) {
     const date = formatDate(filter.date);
     setApiUrl(
-      `https://api.nytimes.com/svc/search/v2/articlesearch.json?q=${filter.headline}&page=${page}&begin_date=${date}&end_date=${date}&api-key=${apiKey}`,
+      `https://api.nytimes.com/svc/search/v2/articlesearch.json?page=${page}&api-key=${apiKey}`,
     );
   }
 
@@ -52,7 +52,7 @@ const ArticleList = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get(apiUrl)
+      .get(`https://api.nytimes.com/svc/search/v2/articlesearch.json?page=${page}&api-key=${apiKey}`)
       .then(response => {
         dispatch(setArticles([...articles, ...response.data.response.docs]));
       })
