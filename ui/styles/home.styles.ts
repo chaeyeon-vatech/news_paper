@@ -106,6 +106,15 @@ const FilterContainer = styled("div")(() => ({
   borderBottom: "1px solid var(--Gray, #C4C4C4)",
 }));
 
+// const DateTypography = styled("div")<{ noMargin?: boolean }>(
+//   ({ theme, noMargin }) => ({
+//     margin: noMargin ? undefined : 16,
+//     display: "flex",
+//     alignItems: "center",
+//     justifyContent: "end",
+//   }),
+// );
+
 const MenuContainer = styled("div")(() => ({
   width: "100%",
   height: "5.31rem",

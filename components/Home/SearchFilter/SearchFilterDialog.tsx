@@ -17,13 +17,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import useClinicValidation from "./useSearchValidation";
 import { FilterType, setFilter } from "store/filterSlice";
 
-function isValidDate(date: Date) {
-  return date !== null && !isNaN(date.getTime());
-}
-
 const SearchFilterDialog = () => {
   const isDialogOpen = useSelector((state: StateType) => state.dialog.isOpen);
-  const dialogContent = useSelector((state: StateType) => state.dialog.content);
   const dispatch = useDispatch();
   const handleCloseDialog = () => {
     dispatch(closeDialog());
@@ -101,20 +96,16 @@ const SearchFilterDialog = () => {
                 return (
                   <Input
                     type="date"
-                    value={value ? new Date(value).toLocaleDateString() : ""}
-                    onChange={(e) => {
+                    value={value ? value.toISOString().split("T")[0] : undefined}
+                    onChange={e => {
                       const selectedDate = new Date(e.target.value);
-                      if (!isNaN(selectedDate.getTime())) {
-                        onChange(selectedDate);
-                      } else {
-                        onChange(null);
-                      }
+                      onChange(selectedDate);
+                      console.log(selectedDate);
                     }}
                   />
                 );
               }}
             />
-
           </StackItem>
           <StackItem>
             <Headline>국가</Headline>
@@ -124,7 +115,7 @@ const SearchFilterDialog = () => {
               <Controller
                 control={control}
                 name="countryList"
-                render={({ field }) => (
+                render={() => (
                   <Stack direction="row" wrap="wrap">
                     {countryList.map((country, index) => (
                       <StackItem

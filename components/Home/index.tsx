@@ -4,15 +4,11 @@ import StackItem from "ui/components/StackItem";
 import SearchFilter from "components/Home/SearchFilter";
 import MenuScreen from "components/Home/Menu";
 import ArticleList from "components/Home/ArticleList";
-import { useDispatch, useSelector } from "react-redux";
-import { StateType } from "../../store";
+import { useDispatch } from "react-redux";
 import { closeDialog } from "../../store/dialogSlice";
 import SearchFilterDialog from "./SearchFilter/SearchFilterDialog";
 
 function HomeScreen() {
-  const isDialogOpen = useSelector((state: StateType) => state.dialog.isOpen);
-  const dialogContent = useSelector((state: StateType) => state.dialog.content);
-
   const dispatch = useDispatch();
 
   // 다이얼로그 닫기
@@ -20,7 +16,6 @@ function HomeScreen() {
     dispatch(closeDialog());
   };
 
-  console.log("isDialogOpen", isDialogOpen);
   return (
     <>
       <Stack direction={"column"} fullWidth fullHeight>
