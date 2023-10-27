@@ -25,21 +25,24 @@ function formatDate(date: Date) {
 
 const ArticleList = () => {
   const articles = useSelector((state: StateType) => state.articles.articles);
-  const page = useSelector((state: StateType) => state.page);
+  const page = useSelector((state: StateType) => state.page) || 1;
   const filter = useSelector((state: StateType) => state.filter);
   const [isLoading, setIsLoading] = useState(true);
+  const apiKey = "Ne9tWZU7ujb4uERYMY7zVz9Vv7Wujvgd";
+
   const [apiUrl, setApiUrl] = useState(
-    "https://api.nytimes.com/svc/search/v2/articlesearch.json",
+    "https://api.nytimes.com/svc/search/v2/articlesearch.json?",
   );
 
   const dispatch = useDispatch();
-  const apiKey = "Ne9tWZU7ujb4uERYMY7zVz9Vv7Wujvgd";
 
   if (filter.date) {
     const date = formatDate(filter.date);
-    setApiUrl(
-      `https://api.nytimes.com/svc/search/v2/articlesearch.json?page=${page}&api-key=${apiKey}`,
-    );
+    setApiUrl(`${apiUrl}&begin_date=${date}&end_date=${date}`);
+  }
+
+  if (filter.headline) {
+    setApiUrl(`${apiUrl}&q=${filter.headline}`);
   }
 
   useEffect(() => {
@@ -50,19 +53,29 @@ const ArticleList = () => {
   }, [filter, dispatch]);
 
   useEffect(() => {
+    let article_url = `${apiUrl}&page=${page}`;
     setIsLoading(true);
+
+    if (filter.date) {
+      article_url = `${article_url}&begin_date=${filter.date}&end_date=${filter.date}`;
+    }
+
+    if (filter.headline) {
+      article_url = `${article_url}&q=${filter.headline}`;
+    }
+
     axios
-      .get(`https://api.nytimes.com/svc/search/v2/articlesearch.json?page=${page}&api-key=${apiKey}`)
+      .get(`${article_url}&api-key=${apiKey}`)
       .then(response => {
         dispatch(setArticles([...articles, ...response.data.response.docs]));
       })
       .catch(error => {
-        console.log("Error Fetching Article", error);
+        console.error("Error Fetching Article", error);
       })
       .finally(() => {
         setIsLoading(false);
       });
-  }, [dispatch, page]);
+  }, [dispatch, page, apiKey, apiUrl]);
 
   const [isScrapped, setIsScrapped] = useState<{ [key: number]: boolean }>({});
 
@@ -72,8 +85,6 @@ const ArticleList = () => {
       [index]: !prevState[index],
     }));
   };
-
-  console.log("articles", articles);
 
   return (
     <InfiniteScroll
