@@ -106,14 +106,15 @@ const FilterContainer = styled("div")(() => ({
   borderBottom: "1px solid var(--Gray, #C4C4C4)",
 }));
 
-// const DateTypography = styled("div")<{ noMargin?: boolean }>(
-//   ({ theme, noMargin }) => ({
-//     margin: noMargin ? undefined : 16,
-//     display: "flex",
-//     alignItems: "center",
-//     justifyContent: "end",
-//   }),
-// );
+const DateTypography = styled("div")(
+  () => ({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "end",
+    color:"#6D6D6D",
+    fontSize: "0.875rem",
+  }),
+);
 
 const MenuContainer = styled("div")(() => ({
   width: "100%",
@@ -154,6 +155,7 @@ export {
   ArticleTitleContainer,
   ArticleTitleTypography,
   ArticleAuthorTypography,
+  DateTypography,
   FilterButton,
   FilterContainer,
   MenuContainer,
